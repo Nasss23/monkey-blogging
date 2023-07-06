@@ -1,6 +1,8 @@
 import React from 'react';
 import styled from 'styled-components';
 import { Label } from '../components/label';
+import Input from '../components/input/Input';
+import { useForm } from 'react-hook-form'
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -22,25 +24,6 @@ const SignUpPageStyles = styled.div`
         row-gap: 20px;
     }
 
-    .input{
-        width: 100%;
-        padding: 20px;
-        background-color: ${props => props.theme.grayLight};
-        border-radius: 6px;
-        font-weight: 500;
-        transition: all 0.2s linear;
-        border: 1px solid transparent;
-    }
-    .input:focus{
-        background-color: white;
-        border-color: ${props => props.theme.primary};;
-    }
-    ::-webkit-input-placeholder{
-    color: #84878b;
-    }
-    ::-moz-input-placeholder{
-    color: #84878b;
-    }
     .form{
         max-width: 600px;
         margin: 0 auto;
@@ -48,21 +31,29 @@ const SignUpPageStyles = styled.div`
 `;
 
 const SignUpPages = () => {
+    const { control, handleSubmit, formState: {
+        errors,
+        isValid,
+        isSubmitting
+    } } = useForm();
+    const handleSignUp = (e) => {
+        console.log(e)
+    }
     return (
         <SignUpPageStyles>
             <div className="container">
                 <img srcSet="/logo.png 2x" alt="monkey-blogging" className='logo' />
                 <div className="heading">Monkey Blogging</div>
-                <form className='form'>
+                <form className='form' onSubmit={handleSubmit(handleSignUp)}>
                     <div className="field">
                         <Label htmlFor="fullname">
                             Fullname
                         </Label>
-                        <input
-                            id='fullname'
+                        <Input
                             type="text"
-                            className="input"
+                            name='fullname'
                             placeholder='Please enter your fullname'
+                            control={control}
                         />
                     </div>
                 </form>
