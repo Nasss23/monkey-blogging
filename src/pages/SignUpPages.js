@@ -3,6 +3,7 @@ import styled from 'styled-components';
 import { Label } from '../components/label';
 import Input from '../components/input/Input';
 import { useForm } from 'react-hook-form'
+import { IconEyeClose } from '../components/icon';
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
