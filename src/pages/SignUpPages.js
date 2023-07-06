@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { Label } from '../components/label';
 import Input from '../components/input/Input';
 import { useForm } from 'react-hook-form'
-import { IconEyeClose } from '../components/icon';
+import { IconEyeClose, IconEyeOpen } from '../components/icon';
 import Field from '../components/field/Field';
 
 const SignUpPageStyles = styled.div`
@@ -34,6 +34,8 @@ const SignUpPages = () => {
     const handleSignUp = (e) => {
         console.log(e)
     }
+    const [togglePassword, setTogglePassword] = useState(false);
+
     return (
         <SignUpPageStyles>
             <div className="container">
@@ -67,12 +69,18 @@ const SignUpPages = () => {
                             Password
                         </Label>
                         <Input
-                            type="password"
+
+                            type={togglePassword ? 'text' : 'password'}
                             name='password'
                             placeholder='Please enter your password'
                             control={control}
                         >
-                            <IconEyeClose className='input-icon'></IconEyeClose>
+                            {!togglePassword ? <IconEyeClose
+                                onClick={() => setTogglePassword(true)}
+                            ></IconEyeClose> : <IconEyeOpen
+                                onClick={() => setTogglePassword(false)}
+                            ></IconEyeOpen>
+                            }
                         </Input>
                     </Field>
                 </form>
