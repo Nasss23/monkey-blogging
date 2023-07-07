@@ -5,6 +5,8 @@ import Input from '../components/input/Input';
 import { useForm } from 'react-hook-form'
 import { IconEyeClose, IconEyeOpen } from '../components/icon';
 import Field from '../components/field/Field';
+import { Button } from '../components/button';
+import { LoadingSpinner } from '../components/loading';
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -26,13 +28,25 @@ const SignUpPageStyles = styled.div`
 `;
 
 const SignUpPages = () => {
-    const { control, handleSubmit, formState: {
-        errors,
-        isValid,
-        isSubmitting
-    } } = useForm();
+    const {
+        control,
+        handleSubmit,
+        formState: {
+            errors,
+            isValid,
+            isSubmitting
+        },
+        watch,
+        reset
+    } = useForm();
     const handleSignUp = (e) => {
         console.log(e)
+        if (!isValid) return;
+        return new Promise((resolve) => {
+            setTimeout(() => {
+                resolve();
+            }, 5000)
+        })
     }
     const [togglePassword, setTogglePassword] = useState(false);
 
@@ -69,7 +83,6 @@ const SignUpPages = () => {
                             Password
                         </Label>
                         <Input
-
                             type={togglePassword ? 'text' : 'password'}
                             name='password'
                             placeholder='Please enter your password'
@@ -83,6 +96,16 @@ const SignUpPages = () => {
                             }
                         </Input>
                     </Field>
+                    <Button
+                        type='submit' style={{
+                            maxWidth: 350,
+                            margin: '0 auto'
+                        }}
+                        isLoading={isSubmitting}
+                        disabled={isSubmitting}
+                    >
+                        Sign Up
+                    </Button>
                 </form>
             </div>
         </SignUpPageStyles>
