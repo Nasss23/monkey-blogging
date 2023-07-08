@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import styled from 'styled-components';
 import { Label } from '../components/label';
 import Input from '../components/input/Input';
@@ -8,6 +8,7 @@ import Field from '../components/field/Field';
 import { Button } from '../components/button';
 import * as yup from 'yup';
 import { yupResolver } from '@hookform/resolvers/yup';
+import { toast } from 'react-toastify';
 
 
 const SignUpPageStyles = styled.div`
@@ -59,6 +60,15 @@ const SignUpPages = () => {
         })
     }
     const [togglePassword, setTogglePassword] = useState(false);
+    useEffect(() => {
+        const arrayError = Object.values(errors)
+        if (arrayError.length > 0) {
+            toast.error(arrayError[0]?.message, {
+                pauseOnHover: false,
+                delay: 100
+            })
+        }
+    }, [errors])
     return (
         <SignUpPageStyles>
             <div className="container">
