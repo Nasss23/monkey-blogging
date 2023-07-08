@@ -6,7 +6,9 @@ import { useForm } from 'react-hook-form'
 import { IconEyeClose, IconEyeOpen } from '../components/icon';
 import Field from '../components/field/Field';
 import { Button } from '../components/button';
-import { LoadingSpinner } from '../components/loading';
+import * as yup from 'yup';
+import { yupResolver } from '@hookform/resolvers/yup';
+
 
 const SignUpPageStyles = styled.div`
     min-height: 100vh;
@@ -27,6 +29,12 @@ const SignUpPageStyles = styled.div`
     }
 `;
 
+const schema = yup.object({
+    fullname: yup.string().required("Please enter your name"),
+    email: yup.string().email("Please enter valid your email").required("Please enter your email address"),
+    password: yup.string().min(8, "Please password must be ad least 8 characters or greater").required("Please enter your password")
+})
+
 const SignUpPages = () => {
     const {
         control,
@@ -38,9 +46,11 @@ const SignUpPages = () => {
         },
         watch,
         reset
-    } = useForm();
+    } = useForm({
+        mode: "onChange",
+        resolver: yupResolver(schema),
+    });
     const handleSignUp = (e) => {
-        console.log(e)
         if (!isValid) return;
         return new Promise((resolve) => {
             setTimeout(() => {
@@ -49,7 +59,6 @@ const SignUpPages = () => {
         })
     }
     const [togglePassword, setTogglePassword] = useState(false);
-
     return (
         <SignUpPageStyles>
             <div className="container">
