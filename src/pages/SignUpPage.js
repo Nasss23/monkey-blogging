@@ -11,7 +11,7 @@ import { yupResolver } from '@hookform/resolvers/yup';
 import { toast } from 'react-toastify';
 import { createUserWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth } from '../firebase/firebase-config';
-import { useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import { addDoc, collection } from 'firebase/firestore';
 import { db } from '../firebase/firebase-config';
 import AuthenticationPage from './AuthenticationPage';
@@ -19,12 +19,20 @@ import AuthenticationPage from './AuthenticationPage';
 
 
 const schema = yup.object({
-    fullname: yup.string().required("Please enter your name"),
-    email: yup.string().email("Please enter valid your email").required("Please enter your email address"),
-    password: yup.string().min(8, "Please password must be ad least 8 characters or greater").required("Please enter your password")
+    fullname: yup
+        .string()
+        .required("Please enter your name"),
+    email: yup
+        .string()
+        .email("Please enter valid your email")
+        .required("Please enter your email address"),
+    password: yup
+        .string()
+        .min(8, "Please password must be ad least 8 characters or greater")
+        .required("Please enter your password")
 })
 
-const SignUpPages = () => {
+const SignUpPage = () => {
     const navigate = useNavigate();
     const {
         control,
@@ -70,7 +78,10 @@ const SignUpPages = () => {
                 delay: 100
             })
         }
-    }, [errors])
+    }, [errors]);
+    useEffect(() => {
+        document.title = "Register Page"
+    })
     return (
         <AuthenticationPage>
             <form className='form' onSubmit={handleSubmit(handleSignUp)} autoComplete='off'>
@@ -114,6 +125,7 @@ const SignUpPages = () => {
                         }
                     </Input>
                 </Field>
+                <div className="have-account">You already have an account <NavLink to={"/sign-in"}>Login</NavLink></div>
                 <Button
                     type='submit' style={{
                         maxWidth: 350,
@@ -129,4 +141,4 @@ const SignUpPages = () => {
     );
 };
 
-export default SignUpPages;
+export default SignUpPage;
