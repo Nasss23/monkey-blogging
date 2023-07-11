@@ -127,7 +127,10 @@ const SignUpPage = () => {
                 </Field>
                 <div className="have-account">You already have an account <NavLink to={"/sign-in"}>Login</NavLink></div>
                 <Button
-                    type='submit' style={{
+                    type='submit'
+
+                    style={{
+                        width: '100%',
                         maxWidth: 350,
                         margin: '0 auto'
                     }}
