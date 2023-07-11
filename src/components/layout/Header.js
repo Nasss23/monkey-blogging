@@ -1,20 +1,21 @@
 import React from 'react';
 import styled from 'styled-components';
 import Button from '../button/Button';
+import { NavLink } from 'react-router-dom';
 
 const menuLinks = [
     {
-        url: '/#',
+        url: '/',
         title: 'Home',
 
     },
     {
-        url: '/#',
+        url: '/blog',
         title: 'Blog',
 
     },
     {
-        url: '/#',
+        url: '/contact',
         title: 'Contact',
 
     }
@@ -37,13 +38,14 @@ const HeaderStyles = styled.div`
         gap: 20px;
         margin-left: 40px;
         list-style: none;
+        font-weight: 500;
     }
 
     .search{
         position: relative;
         margin-left: auto;
         padding: 15px;
-        border: 1px solid #eee;
+        border: 1px solid #cccc;
         border-radius: 8px;
         width: 100%;
         max-width: 320px;
@@ -52,6 +54,7 @@ const HeaderStyles = styled.div`
     .search-input{
         flex: 1;
         padding-right: 45px;
+        font-weight: 500;
     }
     .search-icon{
         position: absolute;
@@ -69,15 +72,15 @@ const Header = () => {
         <HeaderStyles>
             <div className="container">
                 <div className="header-main">
-                    <a href="/">
+                    <NavLink to="/">
                         <img srcSet="/logo.png 2x" alt="monkey-blogging" className='logo' />
-                    </a>
+                    </NavLink>
                     <ul className="menu">
                         {menuLinks.map((item) => (
                             <li className="menu-item" key={item.title}>
-                                <a href={item.url} className="menuLink">
+                                <NavLink to={item.url} className="menuLink">
                                     {item.title}
-                                </a>
+                                </NavLink>
                             </li>
                         ))}
                     </ul>
@@ -91,9 +94,14 @@ const Header = () => {
                             </svg>
                         </span>
                     </div>
-                    <Button style={{
-                        maxWidth: "200px",
-                    }} className="header-button">Sign Up</Button>
+                    <Button
+
+                        height="56px"
+                        className="header-button"
+                        to="/sign-up"
+                    >
+                        Sign Up
+                    </Button>
                 </div>
             </div>
         </HeaderStyles>
