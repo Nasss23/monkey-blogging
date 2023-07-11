@@ -8,8 +8,6 @@ function AuthProvider(props) {
     const value = { userInfo, setUserInfo };
     useEffect(() => {
         onAuthStateChanged(auth, (user) => {
-            console.log('user: ', user);
-
             setUserInfo(user);
         })
     }, [])
