@@ -10,7 +10,6 @@ const HomePageStyles = styled.div`
 `
 
 const HomePage = () => {
-
     return (
         <HomePageStyles>
             <Layout>
