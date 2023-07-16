@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import PostCategory from './PostCategory';
 import PostTitle from './PostTitle';
+import PostMeta from './PostMeta';
 const PostNewestLargeStyles = styled.div`
   .post {
     &-image {
@@ -18,26 +19,7 @@ const PostNewestLargeStyles = styled.div`
     &-category {
       margin-bottom: 10px;
     }
-    &-info {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-size: 14px;
-      font-weight: 600;
-      margin-left: auto;
-    }
-    &-dot {
-      display: inline-block;
-      width: 4px;
-      height: 4px;
-      background-color: currentColor;
-      border-radius: 100rem;
-    }
     &-title {
-      font-weight: bold;
-      line-height: 1.5;
-      display: block;
-      font-size: 22px;
       margin-bottom: 10px;
     }
   }
@@ -56,11 +38,7 @@ const PostNewestLarge = () => {
       <PostTitle size='big'>
         Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
       </PostTitle>
-      <div className='post-info'>
-        <span className='post-time'>Mar 23</span>
-        <span className='post-dot'></span>
-        <span className='post-author'>Andiez Le</span>
-      </div>
+      <PostMeta></PostMeta>
     </PostNewestLargeStyles>
   );
 };
