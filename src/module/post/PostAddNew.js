@@ -4,7 +4,7 @@ import { Dropdown } from 'components/dropdown';
 import { Field } from 'components/field';
 import { Input } from 'components/input';
 import { Label } from 'components/label';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import slugify from 'slugify';
 import styled from 'styled-components';
@@ -15,7 +15,9 @@ import {
   uploadBytesResumable,
   getDownloadURL,
 } from 'firebase/storage';
-
+import ImageUpload from 'components/image/ImageUpload';
+import { addDoc, collection } from 'firebase/firestore';
+import { db } from 'firebase-app/firebase-config';
 
 const PostAddNewStyles = styled.div``;
 
@@ -35,8 +37,15 @@ const PostAddNew = () => {
     const cloneValue = { ...values };
     cloneValue.slug = slugify(values.slug || values.title);
     cloneValue.slug = Number(values.status);
+    // const colRef = collection(db, "posts")
+    // await addDoc(colRef, {
+    //   image
+    // })
     // handleUploadImage(cloneValue.image)
+
   };
+  const [progress, setProgress] = useState(0);
+  const [image, setImage] = useState("")
   const handleUploadImage = (file) => {
     const storage = getStorage();
     const storageRef = ref(storage, 'images/' + file.name);
@@ -46,9 +55,10 @@ const PostAddNew = () => {
       'state_changed',
       (snapshot) => {
         // Get task progress, including the number of bytes uploaded and the total number of bytes to be uploaded
-        const progress =
+        const progressPercent =
           (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-        console.log('Upload is ' + progress + '% done');
+        setProgress(progressPercent);
+        // console.log('Upload is ' + progressPercent + '% done');
         switch (snapshot.state) {
           case 'paused':
             console.log('Upload is paused');
@@ -57,24 +67,27 @@ const PostAddNew = () => {
             console.log('Upload is running');
             break;
           default:
-            console.log("Nothing at all")
+            console.log('Nothing at all');
         }
       },
       (error) => {
-        console.log("Error");
+        console.log('Error');
       },
       () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
+          setImage(downloadURL)
         });
       }
     );
-  }
+  };
   const onSelectImage = (e) => {
     const file = e.target.files[0];
+    console.log('file: ', file);
     if (!file) return;
-    setValue("image", file)
+    setValue('image', file);
+    handleUploadImage(file)
   };
 
   return (
@@ -101,7 +114,12 @@ const PostAddNew = () => {
         <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
             <Label>Image</Label>
-            <input type='file' name='image' onChange={onSelectImage} />
+            <ImageUpload
+              onChange={onSelectImage}
+              className="h-[250px]"
+              progress={progress}
+              image={image}
+            ></ImageUpload>
           </Field>
           <Field>
             <Label>Status</Label>
