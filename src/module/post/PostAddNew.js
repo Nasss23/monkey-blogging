@@ -14,6 +14,7 @@ import {
   ref,
   uploadBytesResumable,
   getDownloadURL,
+  deleteObject,
 } from 'firebase/storage';
 import ImageUpload from 'components/image/ImageUpload';
 import { addDoc, collection } from 'firebase/firestore';
@@ -22,7 +23,7 @@ import { db } from 'firebase-app/firebase-config';
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
-  const { control, watch, setValue, handleSubmit } = useForm({
+  const { control, watch, setValue, handleSubmit, getValues } = useForm({
     mode: 'onChange',
     defaultValues: {
       title: '',
@@ -42,10 +43,9 @@ const PostAddNew = () => {
     //   image
     // })
     // handleUploadImage(cloneValue.image)
-
   };
   const [progress, setProgress] = useState(0);
-  const [image, setImage] = useState("")
+  const [image, setImage] = useState('');
   const handleUploadImage = (file) => {
     const storage = getStorage();
     const storageRef = ref(storage, 'images/' + file.name);
@@ -77,7 +77,7 @@ const PostAddNew = () => {
         // Upload completed successfully, now we can get the download URL
         getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
           console.log('File available at', downloadURL);
-          setImage(downloadURL)
+          setImage(downloadURL);
         });
       }
     );
@@ -86,8 +86,24 @@ const PostAddNew = () => {
     const file = e.target.files[0];
     console.log('file: ', file);
     if (!file) return;
-    setValue('image', file);
-    handleUploadImage(file)
+    setValue('image_name', file.name);
+    handleUploadImage(file);
+  };
+
+  const handleDeleteImage = () => {
+    const storage = getStorage();
+    // Create a reference to the file to delete
+    const imageRef = ref(storage, 'images/' + getValues("image_name"));
+    // Delete the file
+    deleteObject(imageRef)
+      .then(() => {
+        console.log('Remove image successfully');
+        setImage("")
+        setProgress(0)
+      })
+      .catch((error) => {
+        console.log('Can not delete image');
+      });
   };
 
   return (
@@ -116,10 +132,10 @@ const PostAddNew = () => {
             <Label>Image</Label>
             <ImageUpload
               onChange={onSelectImage}
-              className="h-[250px]"
+              className='h-[250px]'
+              handleDeleteImage={handleDeleteImage}
               progress={progress}
-              image={image}
-            ></ImageUpload>
+              image={image}></ImageUpload>
           </Field>
           <Field>
             <Label>Status</Label>
