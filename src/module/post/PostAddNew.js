@@ -4,7 +4,7 @@ import { Dropdown } from 'components/dropdown';
 import { Field } from 'components/field';
 import { Input } from 'components/input';
 import { Label } from 'components/label';
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import slugify from 'slugify';
 import styled from 'styled-components';
@@ -16,7 +16,6 @@ import Toggle from 'components/toggle/Toggle';
 import { collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from 'firebase-app/firebase-config';
 
-
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
@@ -26,17 +25,18 @@ const PostAddNew = () => {
       title: '',
       slug: '',
       status: 2,
-      category: '',
-      hot: false
+      categoryId: '',
+      hot: false,
     },
   });
   const watchStatus = watch('status');
-  const watchHot = watch('hot')
+  const watchHot = watch('hot');
   // const watchCategory = watch('category');
   const addPostHandler = async (values) => {
     const cloneValue = { ...values };
     cloneValue.slug = slugify(values.slug || values.title);
     cloneValue.slug = Number(values.status);
+    console.log('cloneValue: ', cloneValue);
     // const colRef = collection(db, "posts")
     // await addDoc(colRef, {
     //   image
@@ -47,19 +47,21 @@ const PostAddNew = () => {
   const { image, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues);
 
+  const [category, setCatrgory] = useState([]);
+
   useEffect(() => {
     async function getData() {
-      const colRef = collection(db, "category");
-      const q = query(colRef, where("status", "==", 1));
+      const colRef = collection(db, 'category');
+      const q = query(colRef, where('status', '==', 1));
       const querySnapshot = await getDocs(q);
       let result = [];
       querySnapshot.forEach((doc) => {
         result.push({
           id: doc.id,
-          ...doc.data()
-        })
-      })
-      console.log('result: ', result);
+          ...doc.data(),
+        });
+      });
+      setCatrgory(result);
     }
     getData();
   }, []);
@@ -97,7 +99,19 @@ const PostAddNew = () => {
           </Field>
           <Field>
             <Label>Category</Label>
-            {/* <Input></Input> */}
+            <Dropdown>
+              <Dropdown.Select placeholder='Select the category'></Dropdown.Select>
+              <Dropdown.List>
+                {category.length > 0 &&
+                  category.map((item) => (
+                    <Dropdown.Option
+                      key={item.id}
+                      onClick={() => setValue('categoryId', item.id)}>
+                      {item.name}
+                    </Dropdown.Option>
+                  ))}
+              </Dropdown.List>
+            </Dropdown>
           </Field>
           {/* <Field>
             <Label>Author</Label>
@@ -107,14 +121,10 @@ const PostAddNew = () => {
         <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
             <Label>Feature post</Label>
-            {/* <Dropdown>
-              <Dropdown.Option>Knowledge</Dropdown.Option>
-              <Dropdown.Option>Blockchain</Dropdown.Option>
-              <Dropdown.Option>Setup</Dropdown.Option>
-              <Dropdown.Option>Nature</Dropdown.Option>
-              <Dropdown.Option>Developer</Dropdown.Option>
-            </Dropdown> */}
-            <Toggle on={watchHot === true} onClick={() => setValue("hot", !watchHot)} ></Toggle>
+
+            <Toggle
+              on={watchHot === true}
+              onClick={() => setValue('hot', !watchHot)}></Toggle>
           </Field>
           <Field>
             <Label>Status</Label>
