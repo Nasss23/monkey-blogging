@@ -12,6 +12,7 @@ import { postStatus } from 'utils/constants';
 
 import ImageUpload from 'components/image/ImageUpload';
 import useFirebaseImage from 'hooks/useFirebaseImage';
+import Toggle from 'components/toggle/Toggle';
 
 const PostAddNewStyles = styled.div``;
 
@@ -23,9 +24,11 @@ const PostAddNew = () => {
       slug: '',
       status: 2,
       category: '',
+      hot: false
     },
   });
   const watchStatus = watch('status');
+  const watchHot = watch('hot')
   // const watchCategory = watch('category');
   const addPostHandler = async (values) => {
     const cloneValue = { ...values };
@@ -108,14 +111,15 @@ const PostAddNew = () => {
         </div>
         <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
-            <Label>Category</Label>
-            <Dropdown>
+            <Label>Feature post</Label>
+            {/* <Dropdown>
               <Dropdown.Option>Knowledge</Dropdown.Option>
               <Dropdown.Option>Blockchain</Dropdown.Option>
               <Dropdown.Option>Setup</Dropdown.Option>
               <Dropdown.Option>Nature</Dropdown.Option>
               <Dropdown.Option>Developer</Dropdown.Option>
-            </Dropdown>
+            </Dropdown> */}
+            <Toggle on={watchHot === true} onClick={() => setValue("hot", !watchHot)} ></Toggle>
           </Field>
           <Field></Field>
         </div>
