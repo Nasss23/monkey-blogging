@@ -13,12 +13,16 @@ import { postStatus } from 'utils/constants';
 import ImageUpload from 'components/image/ImageUpload';
 import useFirebaseImage from 'hooks/useFirebaseImage';
 import Toggle from 'components/toggle/Toggle';
-import { collection, getDocs, query, where } from 'firebase/firestore';
+import { addDoc, collection, getDocs, query, where } from 'firebase/firestore';
 import { db } from 'firebase-app/firebase-config';
+import { useAuth } from 'contexts/auth-context';
+import { toast } from 'react-toastify';
 
 const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
+  const { userInfo } = useAuth()
+  console.log('userInfo: ', userInfo);
   const { control, watch, setValue, handleSubmit, getValues } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -32,21 +36,22 @@ const PostAddNew = () => {
   const watchStatus = watch('status');
   const watchHot = watch('hot');
   // const watchCategory = watch('category');
-  const addPostHandler = async (values) => {
-    const cloneValue = { ...values };
-    cloneValue.slug = slugify(values.slug || values.title);
-    cloneValue.slug = Number(values.status);
-    console.log('cloneValue: ', cloneValue);
-    // const colRef = collection(db, "posts")
-    // await addDoc(colRef, {
-    //   image
-    // })
-    // handleUploadImage(cloneValue.image)
-  };
-
   const { image, progress, handleSelectImage, handleDeleteImage } =
     useFirebaseImage(setValue, getValues);
 
+  const addPostHandler = async (values) => {
+    const cloneValue = { ...values };
+    cloneValue.slug = slugify(values.slug || values.title, { lower: true });
+    cloneValue.status = Number(values.status);
+    const colRef = collection(db, 'posts');
+    await addDoc(colRef, {
+      ...cloneValue,
+      image,
+      userId: userInfo.uid
+    });
+    toast.success("Create new post successfully")
+    console.log('cloneValue: ', cloneValue);
+  };
   const [category, setCatrgory] = useState([]);
 
   useEffect(() => {
