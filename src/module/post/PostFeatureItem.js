@@ -1,9 +1,11 @@
-import React from "react";
-import styled from "styled-components";
-import PostCategory from "./PostCategory";
-import PostImage from "./PostImage";
-import PostMeta from "./PostMeta";
-import PostTitle from "./PostTitle";
+import React, { useEffect, useState } from 'react';
+import styled from 'styled-components';
+import PostCategory from './PostCategory';
+import PostImage from './PostImage';
+import PostMeta from './PostMeta';
+import PostTitle from './PostTitle';
+import { collection, doc, getDoc, query, where } from 'firebase/firestore';
+import { db } from 'firebase-app/firebase-config';
 const PostFeatureItemStyles = styled.div`
   width: 100%;
   border-radius: 16px;
@@ -49,22 +51,40 @@ const PostFeatureItemStyles = styled.div`
     }
   }
 `;
-const PostFeatureItem = () => {
+const PostFeatureItem = ({ data }) => {
+  console.log('data: ', data);
+  const [category, setCategory] = useState('');
+  const [user, setUser] = useState('');
+  useEffect(() => {
+    async function fetch() {
+      const docRef = doc(db, 'category', data.categoryId);
+      const docSnap = await getDoc(docRef);
+      setCategory(docSnap.data());
+    }
+
+    fetch();
+  }, [data.categoryId]);
+
+  useEffect(() => {
+    async function fetchUser() {
+      const docRef = doc(db, 'to user', data.userId);
+      const docSnap = await getDoc(docRef);
+      console.log('docSnap1111: ', docSnap.data());
+      setUser(docSnap.data());
+    }
+    fetchUser();
+  }, [data.userId])
+  if (!data || !data.id) return null;
   return (
     <PostFeatureItemStyles>
-      <PostImage
-        url="https://images.unsplash.com/photo-1614624532983-4ce03382d63d?ixlib=rb-1.2.1&ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8&auto=format&fit=crop&w=2662&q=80"
-        alt="unsplash"
-      ></PostImage>
-      <div className="post-overlay"></div>
-      <div className="post-content">
-        <div className="post-top">
-          <PostCategory>Kiến thức</PostCategory>
-          <PostMeta></PostMeta>
+      <PostImage url={data.image} alt='unsplash'></PostImage>
+      <div className='post-overlay'></div>
+      <div className='post-content'>
+        <div className='post-top'>
+          {category?.name && <PostCategory>{category.name}</PostCategory>}
+          <PostMeta authorName={user?.name}></PostMeta>
         </div>
-        <PostTitle size="big">
-          Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
-        </PostTitle>
+        <PostTitle size='big'>{data.title}</PostTitle>
       </div>
     </PostFeatureItemStyles>
   );
