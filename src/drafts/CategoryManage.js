@@ -1,16 +1,15 @@
-import { Table } from "components/table";
 import DashboardHeading from "module/dashboard/DashboardHeading";
 import React from "react";
 
-const DashboardPage = () => {
+const CategoryManage = () => {
   return (
     <div>
       <DashboardHeading
-        title="Dashboard"
-        desc="Overview dashboard monitor"
+        title="Categories"
+        desc="Manage your category"
       ></DashboardHeading>
     </div>
   );
 };
 
-export default DashboardPage;
+export default CategoryManage;
