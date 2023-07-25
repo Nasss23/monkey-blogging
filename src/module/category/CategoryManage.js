@@ -8,9 +8,11 @@ import DashboardHeading from 'module/dashboard/DashboardHeading';
 import React, { useEffect, useState } from 'react';
 import { categoryStatus } from 'utils/constants';
 import Swal from 'sweetalert2';
+import { useNavigate } from 'react-router-dom';
 
 const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
+  const navigate = useNavigate();
   useEffect(() => {
     const colRef = collection(db, 'category');
     onSnapshot(colRef, (snapshot) => {
@@ -78,7 +80,7 @@ const CategoryManage = () => {
                 <td>
                   <div className='flex items-center gap-x-3'>
                     <ActionView></ActionView>
-                    <ActionEdit></ActionEdit>
+                    <ActionEdit onClick={() => navigate(`/manage/update-category?id=${category.id}`)}></ActionEdit>
                     <ActionDelete
                       onClick={() =>
                         handleDeleteCategory(category.id)
