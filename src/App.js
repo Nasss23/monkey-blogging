@@ -24,7 +24,6 @@ function App() {
           <Route path="/" element={<HomePage></HomePage>}></Route>
           <Route path="/sign-up" element={<SignUpPage></SignUpPage>}></Route>
           <Route path="/sign-in" element={<SignInPage></SignInPage>}></Route>
-
           <Route path="*" element={<PageNotFound></PageNotFound>}></Route>
           <Route
             path="/:slug"
@@ -36,7 +35,7 @@ function App() {
               element={<DashboardPage></DashboardPage>}
             ></Route>
             <Route
-              path="/manage/posts"
+              path="/manage/post"
               element={<PostManage></PostManage>}
             ></Route>
             <Route

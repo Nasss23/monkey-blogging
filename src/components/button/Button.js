@@ -31,6 +31,16 @@ const ButtonStyles = styled.button`
         ${(props) => props.theme.secondary}
       );
     `};
+    ${(props) =>
+    props.kind === "ghost" &&
+    css`
+      color: ${(props) => props.theme.primary};
+      background-color: rgba(29, 192, 113, 0.1);
+    `};
+  &:disabled {
+    opacity: 0.5;
+    pointer-events: none;
+  }
   &:disabled {
     opacity: 0.5;
     pointer-events: none;
@@ -43,7 +53,7 @@ const ButtonStyles = styled.button`
  */
 const Button = ({
   type = "button",
-  onClick = () => {},
+  onClick = () => { },
   children,
   kind = "primary",
   ...props

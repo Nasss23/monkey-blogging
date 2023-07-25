@@ -3,19 +3,32 @@ import { Button } from 'components/button';
 import { LabelStatus } from 'components/label';
 import { Table } from 'components/table';
 import { db } from 'firebase-app/firebase-config';
-import { collection, deleteDoc, doc, getDoc, onSnapshot } from 'firebase/firestore';
+import {
+  collection,
+  deleteDoc,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  where,
+} from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { categoryStatus } from 'utils/constants';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
+import { debounce } from 'lodash';
 
 const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
   const navigate = useNavigate();
+  const [filter, setFilter] = useState("")
   useEffect(() => {
     const colRef = collection(db, 'category');
-    onSnapshot(colRef, (snapshot) => {
+    const newRef = filter
+      ? query(colRef, where('name', '==', filter))
+      : colRef;
+    onSnapshot(newRef, (snapshot) => {
       let result = [];
       snapshot.forEach((doc) => {
         result.push({
@@ -25,7 +38,8 @@ const CategoryManage = () => {
       });
       setCategoyList(result);
     });
-  }, []);
+  }, [filter]);
+
   const handleDeleteCategory = async (docId) => {
     const colRef = doc(db, 'category', docId);
     Swal.fire({
@@ -43,6 +57,9 @@ const CategoryManage = () => {
       }
     });
   };
+  const handleInputFilter = debounce((e) => {
+    setFilter(e.target.value)
+  }, 500)
   return (
     <div>
       <DashboardHeading title='Categories' desc='Manage your category'>
@@ -50,6 +67,14 @@ const CategoryManage = () => {
           Create category
         </Button>
       </DashboardHeading>
+      <div className='flex justify-end mb-10'>
+        <input
+          type='text'
+          placeholder='Search category....'
+          className='px-5 py-4 border border-gray-400 rounded-lg'
+          onChange={handleInputFilter}
+        />
+      </div>
       <Table>
         <thead>
           <tr>
@@ -80,7 +105,10 @@ const CategoryManage = () => {
                 <td>
                   <div className='flex items-center gap-x-3'>
                     <ActionView></ActionView>
-                    <ActionEdit onClick={() => navigate(`/manage/update-category?id=${category.id}`)}></ActionEdit>
+                    <ActionEdit
+                      onClick={() =>
+                        navigate(`/manage/update-category?id=${category.id}`)
+                      }></ActionEdit>
                     <ActionDelete
                       onClick={() =>
                         handleDeleteCategory(category.id)
