@@ -4,27 +4,53 @@ import { Field, FieldCheckboxes } from 'components/field';
 import { Input } from 'components/input';
 import { Label } from 'components/label';
 import DashboardHeading from 'drafts/DashboardHeading';
-import React from 'react';
+import { db } from 'firebase-app/firebase-config';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
+import React, { useEffect } from 'react';
 import { useForm } from 'react-hook-form';
-import { useSearchParams } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
+import { toast } from 'react-toastify';
+import slugify from 'slugify';
+import { categoryStatus } from 'utils/constants';
 
 const CategoryUpdate = () => {
-    const { control } = useForm({
+    const { control, reset, watch, handleSubmit, formState: {
+        isSubmitting
+    } } = useForm({
         mode: "onChange",
         defaultValues: {
 
         }
     })
     const [params] = useSearchParams();
-    console.log('params: ', params.get('id'));
     const categoryId = params.get('id');
+    const navigate = useNavigate()
+    useEffect(() => {
+        async function fetchData() {
+            const colRef = doc(db, "category", categoryId);
+            const sìngleDoc = await getDoc(colRef)
+            reset(sìngleDoc.data())
+        }
+        fetchData()
+    }, [categoryId, reset])
+    const watchStatus = watch("status")
+    const handleUpdateCategory = async (values) => {
+        const colRef = doc(db, "category", categoryId);
+        await updateDoc(colRef, {
+            name: values.name,
+            slug: slugify(values.slug || values.name, { lower: true }),
+            status: Number(values.status)
+        });
+        toast.success("Update category successfully!")
+        navigate("/manage/category")
+    };
     if (!categoryId) return null;
     return (
         <div>
             <DashboardHeading
                 title='Update category'
                 desc={`Update your category id: ${categoryId}`}></DashboardHeading>
-            <form autoComplete='of'>
+            <form onSubmit={handleSubmit(handleUpdateCategory)} autoComplete='of'>
                 <div className='form-layout'>
                     <Field>
                         <Label>Name</Label>
@@ -49,23 +75,23 @@ const CategoryUpdate = () => {
                             <Radio
                                 name='status'
                                 control={control}
-                            // checked={Number(watchStatus) === categoryStatus.APPROVED}
-                            // value={categoryStatus.APPROVED}
+                                checked={Number(watchStatus) === categoryStatus.APPROVED}
+                                value={categoryStatus.APPROVED}
                             >
                                 Approved
                             </Radio>
                             <Radio
                                 name='status'
                                 control={control}
-                            // checked={Number(watchStatus) === categoryStatus.UNAPPROVED}
-                            // value={categoryStatus.UNAPPROVED}
+                                checked={Number(watchStatus) === categoryStatus.UNAPPROVED}
+                                value={categoryStatus.UNAPPROVED}
                             >
                                 Unapproved
                             </Radio>
                         </FieldCheckboxes>
                     </Field>
                 </div>
-                <Button kind='primary' className='mx-auto w-[230px]' type='submit' >
+                <Button kind='primary' className='mx-auto w-[230px]' type='submit' desabled={isSubmitting} isLoading={isSubmitting}>
                     Update category
                 </Button>
             </form>

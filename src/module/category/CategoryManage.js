@@ -70,10 +70,10 @@ const CategoryManage = () => {
                   <span className='italic text-gray-400'>{category.slug}</span>
                 </td>
                 <td>
-                  {category.status === categoryStatus.APPROVED && (
+                  {Number(category.status) === categoryStatus.APPROVED && (
                     <LabelStatus type='success'>Approved</LabelStatus>
                   )}
-                  {category.status === categoryStatus.UNAPPROVED && (
+                  {Number(category.status) === categoryStatus.UNAPPROVED && (
                     <LabelStatus type='warning'>Unapproved</LabelStatus>
                   )}
                 </td>
