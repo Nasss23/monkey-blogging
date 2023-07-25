@@ -1,11 +1,19 @@
-import React from "react";
+import React from 'react';
+import styled from 'styled-components';
 
-const DashboardHeading = ({ title = "", desc = "" }) => {
+const DashboardHeadingStyles = styled.div`
+  .dashboard-heading {
+    margin-bottom: 10px;
+  }
+`;
+
+const DashboardHeading = ({ title = '', desc = '' }) => {
   return (
-    <div className="mb-10">
-      <h1 className="dashboard-heading">{title}</h1>
-      <p className="dashboard-short-desc">{desc}</p>
-    </div>
+
+    <DashboardHeadingStyles className='mb-10'>
+      <h1 className='dashboard-heading'>{title}</h1>
+      <p className='dashboard-short-desc'>{desc}</p>
+    </DashboardHeadingStyles>
   );
 };
 
