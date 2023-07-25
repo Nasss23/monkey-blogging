@@ -1,19 +1,18 @@
-import useFirebaseImage from "hooks/useFirebaseImage";
-import Toggle from "components/toggle/Toggle";
-import slugify from "slugify";
-import React, { useEffect, useState } from "react";
-import ImageUpload from "components/image/ImageUpload";
-import { useForm } from "react-hook-form";
-import { useAuth } from "contexts/auth-context";
-import { toast } from "react-toastify";
-import { Radio } from "components/checkbox";
-import { postStatus } from "utils/constants";
-import { Label } from "components/label";
-import { Input } from "components/input";
-import { Field, FieldCheckboxes } from "components/field";
-import { Dropdown } from "components/dropdown";
-import { db } from "firebase-app/firebase-config";
-import { Button } from "components/button";
+import { Button } from 'components/button';
+import { Radio } from 'components/checkbox';
+import { Dropdown } from 'components/dropdown';
+import { Field } from 'components/field';
+import { Input } from 'components/input';
+import { Label } from 'components/label';
+import React, { useEffect, useState } from 'react';
+import { useForm } from 'react-hook-form';
+import slugify from 'slugify';
+import styled from 'styled-components';
+import { postStatus } from 'utils/constants';
+
+import ImageUpload from 'components/image/ImageUpload';
+import useFirebaseImage from 'hooks/useFirebaseImage';
+import Toggle from 'components/toggle/Toggle';
 import {
   addDoc,
   collection,
@@ -21,24 +20,30 @@ import {
   query,
   serverTimestamp,
   where,
-} from "firebase/firestore";
-import DashboardHeading from "module/dashboard/DashboardHeading";
+} from 'firebase/firestore';
+import { db } from 'firebase-app/firebase-config';
+import { useAuth } from 'contexts/auth-context';
+import { toast } from 'react-toastify';
+
+const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
   const { userInfo } = useAuth();
   const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
-    mode: "onChange",
+    mode: 'onChange',
     defaultValues: {
-      title: "",
-      slug: "",
+      title: '',
+      slug: '',
       status: 2,
-      categoryId: "",
+      categoryId: '',
       hot: false,
-      image: "",
+      image: '',
     },
   });
-  const watchStatus = watch("status");
-  const watchHot = watch("hot");
+  const watchStatus = watch('status');
+  const watchHot = watch('hot');
+  // const watchCategory = watch('category');
+
   const {
     image,
     handleResetUpload,
@@ -46,32 +51,33 @@ const PostAddNew = () => {
     handleSelectImage,
     handleDeleteImage,
   } = useFirebaseImage(setValue, getValues);
-  const [categories, setCategories] = useState([]);
-  const [selectCategory, setSelectCategory] = useState("");
+  const [category, setCatrgory] = useState([]);
+  const [selectCategory, setSelectCategory] = useState('');
   const [loading, setLoading] = useState(false);
+
   const addPostHandler = async (values) => {
     setLoading(true);
     try {
-      const cloneValues = { ...values };
-      cloneValues.slug = slugify(values.slug || values.title, { lower: true });
-      cloneValues.status = Number(values.status);
-      const colRef = collection(db, "posts");
+      const cloneValue = { ...values };
+      cloneValue.slug = slugify(values.slug || values.title, { lower: true });
+      cloneValue.status = Number(values.status);
+      const colRef = collection(db, 'posts');
       await addDoc(colRef, {
-        ...cloneValues,
+        ...cloneValue,
         image,
         userId: userInfo.uid,
-        createdAt: serverTimestamp(),
+        createAt: serverTimestamp(),
       });
-      toast.success("Create new post successfully!");
+      toast.success('Create new post successfully');
       reset({
-        title: "",
-        slug: "",
+        title: '',
+        slug: '',
         status: 2,
-        categoryId: "",
+        categoryId: '',
         hot: false,
-        image: "",
+        image: '',
       });
-      handleResetUpload();
+      handleResetUpload('');
       setSelectCategory({});
     } catch (error) {
       setLoading(false);
@@ -82,8 +88,8 @@ const PostAddNew = () => {
 
   useEffect(() => {
     async function getData() {
-      const colRef = collection(db, "categories");
-      const q = query(colRef, where("status", "==", 1));
+      const colRef = collection(db, 'category');
+      const q = query(colRef, where('status', '==', 1));
       const querySnapshot = await getDocs(q);
       let result = [];
       querySnapshot.forEach((doc) => {
@@ -92,125 +98,125 @@ const PostAddNew = () => {
           ...doc.data(),
         });
       });
-      setCategories(result);
+      setCatrgory(result);
     }
     getData();
   }, []);
 
   useEffect(() => {
-    document.title = "Monkey Blogging - Add new post";
-  }, []);
+    document.title = 'Monkey Bloggig - Add new post'
+  })
 
   const handleClickOption = (item) => {
-    setValue("categoryId", item.id);
+    setValue('categoryId', item.id);
     setSelectCategory(item);
   };
 
   return (
-    <>
-      <DashboardHeading title="Add post" desc="Add new post"></DashboardHeading>
+    <PostAddNewStyles>
+      <h1 className='dashboard-heading'>Add new post</h1>
       <form onSubmit={handleSubmit(addPostHandler)}>
-        <div className="form-layout">
+        <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
             <Label>Title</Label>
             <Input
               control={control}
-              placeholder="Enter your title"
-              name="title"
-              required
-            ></Input>
+              placeholder='Enter your title'
+              name='title'
+              required></Input>
           </Field>
           <Field>
             <Label>Slug</Label>
             <Input
               control={control}
-              placeholder="Enter your slug"
-              name="slug"
-            ></Input>
+              placeholder='Enter your slug'
+              name='slug'></Input>
           </Field>
         </div>
-        <div className="form-layout">
+        <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
             <Label>Image</Label>
             <ImageUpload
               onChange={handleSelectImage}
+              className='h-[250px]'
               handleDeleteImage={handleDeleteImage}
-              className="h-[250px]"
               progress={progress}
-              image={image}
-            ></ImageUpload>
+              image={image}></ImageUpload>
           </Field>
           <Field>
             <Label>Category</Label>
             <Dropdown>
-              <Dropdown.Select placeholder="Select the category"></Dropdown.Select>
+              {/* <Dropdown.Select placeholder={`${selectCategory.name || 'Select the category'}`}></Dropdown.Select> */}
+              <Dropdown.Select placeholder='Select the category'></Dropdown.Select>
               <Dropdown.List>
-                {categories.length > 0 &&
-                  categories.map((item) => (
+                {category.length > 0 &&
+                  category.map((item) => (
                     <Dropdown.Option
                       key={item.id}
-                      onClick={() => handleClickOption(item)}
-                    >
+                      onClick={() => handleClickOption(item)}>
                       {item.name}
                     </Dropdown.Option>
                   ))}
               </Dropdown.List>
             </Dropdown>
             {selectCategory?.name && (
-              <span className="inline-block p-3 rounded-lg bg-green-50 text-sm text-green-600 font-medium">
-                {selectCategory?.name}
+              <span className='inline-block p-3 text-sm font-medium text-green-600 rounded-lg bg-green-50'>
+                {selectCategory.name}
               </span>
             )}
           </Field>
+          {/* <Field>
+            <Label>Author</Label>
+            <Input control={control} placeholder='Find the author'></Input>
+          </Field> */}
         </div>
-        <div className="form-layout">
+        <div className='grid grid-cols-2 mb-10 gap-x-10'>
           <Field>
             <Label>Feature post</Label>
+
             <Toggle
               on={watchHot === true}
-              onClick={() => setValue("hot", !watchHot)}
-            ></Toggle>
+              onClick={() => setValue('hot', !watchHot)}></Toggle>
           </Field>
           <Field>
             <Label>Status</Label>
-            <FieldCheckboxes>
+            <div className='flex items-center gap-x-5'>
               <Radio
-                name="status"
+                name='status'
                 control={control}
                 checked={Number(watchStatus) === postStatus.APPROVED}
-                value={postStatus.APPROVED}
-              >
+                onClick={() => setValue('status', 'approved')}
+                value={postStatus.APPROVED}>
                 Approved
               </Radio>
               <Radio
-                name="status"
+                name='status'
                 control={control}
                 checked={Number(watchStatus) === postStatus.PENDING}
-                value={postStatus.PENDING}
-              >
+                onClick={() => setValue('status', 'pending')}
+                value={postStatus.PENDING}>
                 Pending
               </Radio>
               <Radio
-                name="status"
+                name='status'
                 control={control}
                 checked={Number(watchStatus) === postStatus.REJECTED}
-                value={postStatus.REJECTED}
-              >
+                onClick={() => setValue('status', 'reject')}
+                value={postStatus.REJECTED}>
                 Reject
               </Radio>
-            </FieldCheckboxes>
+            </div>
           </Field>
         </div>
         <Button
-          type="submit"
-          className="mx-auto w-[250px]"
+          type='submit'
+          className='mx-auto w-[250px]'
           isLoading={loading}
-          disabled={loading}
-        >
+          disabled={loading}>
           Add new post
         </Button>
       </form>
-    </>
+    </PostAddNewStyles>
   );
 };
 

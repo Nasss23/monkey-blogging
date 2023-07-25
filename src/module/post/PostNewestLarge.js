@@ -34,9 +34,9 @@ const PostNewestLarge = () => {
         alt=""
       ></PostImage>
 
-      <PostCategory>Knowledge</PostCategory>
+      <PostCategory>Kiến thức</PostCategory>
       <PostTitle size="big">
-        The complete guide to learn new languages for beginners
+        Hướng dẫn setup phòng cực chill dành cho người mới toàn tập
       </PostTitle>
       <PostMeta></PostMeta>
     </PostNewestLargeStyles>

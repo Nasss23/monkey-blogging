@@ -6,7 +6,7 @@ function DropdownProvider(props) {
   const toggle = () => {
     setShow(!show);
   };
-  const values = { show, setShow, toggle };
+  const values = { show, setShow, toggle }
   return (
     <DropdownContext.Provider value={values}>
       {props.children}

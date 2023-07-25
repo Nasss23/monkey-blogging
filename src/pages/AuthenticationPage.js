@@ -33,11 +33,9 @@ const AuthenticationPage = ({ children }) => {
   return (
     <AuthenticationPageStyles>
       <div className="container">
-        <div className="text-center">
-          <NavLink to="/" className="inline-block">
-            <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
-          </NavLink>
-        </div>
+        <NavLink to="/">
+          <img srcSet="/logo.png 2x" alt="monkey-blogging" className="logo" />
+        </NavLink>
         <h1 className="heading">Monkey Blogging</h1>
         {children}
       </div>
