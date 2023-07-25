@@ -7,13 +7,12 @@ import {
   collection,
   deleteDoc,
   doc,
-  getDoc,
   onSnapshot,
   query,
   where,
 } from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
-import React, { useEffect, useRef, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { categoryStatus } from 'utils/constants';
 import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
@@ -22,14 +21,20 @@ import { debounce } from 'lodash';
 const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
   const navigate = useNavigate();
-  const [filter, setFilter] = useState("")
+  const [filter, setFilter] = useState('');
+  const [categoryCount, setCategoyCount] = useState(0)
   useEffect(() => {
     const colRef = collection(db, 'category');
     const newRef = filter
-      ? query(colRef, where('name', '==', filter))
+      ? query(
+        colRef,
+        where('name', '>=', filter),
+        where('name', '<=', filter + 'utf8'),
+      )
       : colRef;
     onSnapshot(newRef, (snapshot) => {
       let result = [];
+      setCategoyCount(Number(snapshot.size));
       snapshot.forEach((doc) => {
         result.push({
           id: doc.id,
@@ -58,8 +63,8 @@ const CategoryManage = () => {
     });
   };
   const handleInputFilter = debounce((e) => {
-    setFilter(e.target.value)
-  }, 500)
+    setFilter(e.target.value);
+  }, 500);
   return (
     <div>
       <DashboardHeading title='Categories' desc='Manage your category'>
