@@ -1,4 +1,5 @@
 import { ActionDelete, ActionEdit } from 'components/action';
+import { LabelStatus } from 'components/label';
 import { Table } from 'components/table';
 import { db } from 'firebase-app/firebase-config';
 import { collection, deleteDoc, doc, onSnapshot } from 'firebase/firestore';
@@ -7,6 +8,7 @@ import { useEffect } from 'react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Swal from 'sweetalert2';
+import { userRole, userStatus } from 'utils/constants';
 
 const UserTable = () => {
     const [userList, setUserList] = useState([]);
@@ -24,6 +26,30 @@ const UserTable = () => {
             setUserList(results);
         });
     }, []);
+    const renderRoleLabel = (role) => {
+        switch (role) {
+            case userRole.ADMIN:
+                return 'Admin'
+            case userRole.MOD:
+                return 'Moderator'
+            case userRole.USER:
+                return 'User'
+            default:
+                break;
+        }
+    }
+    const renderLabelStatus = (status) => {
+        switch (status) {
+            case userStatus.ACTIVE:
+                return <LabelStatus type='success'>Active</LabelStatus>
+            case userStatus.PENDING:
+                return <LabelStatus type='warning'>Pending</LabelStatus>
+            case userStatus.BAN:
+                return <LabelStatus type='danger'>Ban</LabelStatus>
+            default:
+                break
+        }
+    }
 
     const renderUserItem = (user) => {
         console.log('user: ', user);
@@ -32,17 +58,17 @@ const UserTable = () => {
                 <td title={user.id}>{user.id.slice(0, 5) + "..."}</td>
                 <td className='whitespace-nowrap'>
                     <div className='flex items-center gap-x-3'>
-                        <img src="https://plus.unsplash.com/premium_photo-1690297971162-5fe7ddf2c48d?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxlZGl0b3JpYWwtZmVlZHwyfHx8ZW58MHx8fHx8&auto=format&fit=crop&w=500&q=60" alt="" className='flex-shrink-0 object-cover w-10 h-10 rounded-md' />
+                        <img src={user?.avatar} alt="" className='flex-shrink-0 object-cover w-10 h-10 rounded-md' />
                         <div className="flex-1">
                             <h3>{user?.fullname}</h3>
-                            <time className='text-sm text-gray-400'>{new Date().toLocaleDateString()}</time>
+                            <time className='text-sm text-gray-400'>{new Date(user?.createdAt?.seconds * 1000).toLocaleDateString('vi-VI')}</time>
                         </div>
                     </div>
                 </td>
                 <td>{user?.username}</td>
                 <td>{user.email.slice(0, 5) + "...@gmail.com"}</td>
-                <td></td>
-                <td></td>
+                <td>{renderLabelStatus(Number(user?.status))}</td>
+                <td>{renderRoleLabel(Number(user?.role))}</td>
                 <td>
                     <div className='flex items-center gap-x-3'>
                         <ActionEdit
