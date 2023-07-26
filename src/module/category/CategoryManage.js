@@ -21,16 +21,19 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { debounce } from 'lodash';
 
+const CATEGORY_PER_PAGE = 10;
+
 const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
   const navigate = useNavigate();
   const [filter, setFilter] = useState('');
   const [lastDoc, setLastDoc] = useState();
+  const [total, setTotal] = useState(0)
   const handleLoadMoreCategory = async () => {
     const nextRef = query(
       collection(db, 'category'),
       startAfter(lastDoc || 0),
-      limit(1)
+      limit(CATEGORY_PER_PAGE)
     );
     onSnapshot(nextRef, (snapshot) => {
       let result = [];
@@ -40,9 +43,14 @@ const CategoryManage = () => {
           ...doc.data(),
         });
       });
-      setCategoyList(result);
+      setCategoyList([...categoryList, ...result]);
     });
-    setLastDoc(nextRef);
+    const documentSnapshots = await getDocs(nextRef);
+    // Get the last visible document
+    const lastVisible =
+      documentSnapshots.docs[documentSnapshots.docs.length - 1];
+
+    setLastDoc(lastVisible);
   };
 
   useEffect(() => {
@@ -54,12 +62,16 @@ const CategoryManage = () => {
           where('name', '>=', filter),
           where('name', '<=', filter + 'utf8')
         )
-        : query(colRef, limit(1));
-      const documentSnapshots = await getDocs(newRef);
+        : query(colRef, limit(CATEGORY_PER_PAGE));
 
+      const documentSnapshots = await getDocs(newRef);
       // Get the last visible document
       const lastVisible =
         documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      onSnapshot(colRef, snapshot => {
+        setTotal(snapshot.size);
+      });
+
       setLastDoc(lastVisible);
       onSnapshot(newRef, (snapshot) => {
         let result = [];
@@ -154,9 +166,11 @@ const CategoryManage = () => {
             ))}
         </tbody>
       </Table>
-      <div className='mt-10'>
-        <button onClick={handleLoadMoreCategory}>Load more</button>
-      </div>
+      {total > categoryList.length &&
+        <div className='mt-10'>
+          <Button onClick={handleLoadMoreCategory} className={'mx-auto'}>Load more</Button>
+        </div>
+      }
     </div>
   );
 };
