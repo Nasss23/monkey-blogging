@@ -7,8 +7,11 @@ import {
   collection,
   deleteDoc,
   doc,
+  getDocs,
+  limit,
   onSnapshot,
   query,
+  startAfter,
   where,
 } from 'firebase/firestore';
 import DashboardHeading from 'module/dashboard/DashboardHeading';
@@ -22,19 +25,15 @@ const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
   const navigate = useNavigate();
   const [filter, setFilter] = useState('');
-  const [categoryCount, setCategoyCount] = useState(0)
-  useEffect(() => {
-    const colRef = collection(db, 'category');
-    const newRef = filter
-      ? query(
-        colRef,
-        where('name', '>=', filter),
-        where('name', '<=', filter + 'utf8'),
-      )
-      : colRef;
-    onSnapshot(newRef, (snapshot) => {
+  const [lastDoc, setLastDoc] = useState();
+  const handleLoadMoreCategory = async () => {
+    const nextRef = query(
+      collection(db, 'category'),
+      startAfter(lastDoc || 0),
+      limit(1)
+    );
+    onSnapshot(nextRef, (snapshot) => {
       let result = [];
-      setCategoyCount(Number(snapshot.size));
       snapshot.forEach((doc) => {
         result.push({
           id: doc.id,
@@ -43,6 +42,37 @@ const CategoryManage = () => {
       });
       setCategoyList(result);
     });
+    setLastDoc(nextRef);
+  };
+
+  useEffect(() => {
+    async function fetchData() {
+      const colRef = collection(db, 'category');
+      const newRef = filter
+        ? query(
+          colRef,
+          where('name', '>=', filter),
+          where('name', '<=', filter + 'utf8')
+        )
+        : query(colRef, limit(1));
+      const documentSnapshots = await getDocs(newRef);
+
+      // Get the last visible document
+      const lastVisible =
+        documentSnapshots.docs[documentSnapshots.docs.length - 1];
+      setLastDoc(lastVisible);
+      onSnapshot(newRef, (snapshot) => {
+        let result = [];
+        snapshot.forEach((doc) => {
+          result.push({
+            id: doc.id,
+            ...doc.data(),
+          });
+        });
+        setCategoyList(result);
+      });
+    }
+    fetchData();
   }, [filter]);
 
   const handleDeleteCategory = async (docId) => {
@@ -124,6 +154,9 @@ const CategoryManage = () => {
             ))}
         </tbody>
       </Table>
+      <div className='mt-10'>
+        <button onClick={handleLoadMoreCategory}>Load more</button>
+      </div>
     </div>
   );
 };
