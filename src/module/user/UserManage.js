@@ -1,6 +1,7 @@
 import DashboardHeading from "module/dashboard/DashboardHeading";
-import React, { useState } from "react";
+import React from "react";
 import UserTable from "./UserTable";
+import { Button } from "components/button";
 
 const UserManage = () => {
   return (
@@ -9,6 +10,9 @@ const UserManage = () => {
         title="Users"
         desc="Manage your user"
       ></DashboardHeading>
+      <div className="flex justify-end mb-10">
+        <Button to="/manage/add-user">Add new user</Button>
+      </div>
       <UserTable></UserTable>
     </div>
   );
