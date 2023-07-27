@@ -66,7 +66,7 @@ const UserTable = () => {
                     </div>
                 </td>
                 <td>{user?.username}</td>
-                <td>{user.email.slice(0, 5) + "...@gmail.com"}</td>
+                <td>{user?.email.slice(0, 5) + "..."}</td>
                 <td>{renderLabelStatus(Number(user?.status))}</td>
                 <td>{renderRoleLabel(Number(user?.role))}</td>
                 <td>
