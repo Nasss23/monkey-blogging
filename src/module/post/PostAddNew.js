@@ -31,7 +31,6 @@ const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
   const { userInfo } = useAuth();
-  console.log('userInfo: ', userInfo);
   const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
     mode: 'onChange',
     defaultValues: {
@@ -40,13 +39,13 @@ const PostAddNew = () => {
       status: 2,
       hot: false,
       image: '',
-      category: {}
+      category: {},
+      user: {}
     },
   });
   const watchStatus = watch('status');
   const watchHot = watch('hot');
   // const watchCategory = watch('category');
-
   const {
     image,
     handleResetUpload,
@@ -61,18 +60,19 @@ const PostAddNew = () => {
   const [categoryDetails, setCatrgoryDetails] = useState({})
   useEffect(() => {
     async function fetchUserDate() {
-      if (!userInfo.id) return;
-      const colRef = doc(db, 'users', userInfo.email)
-      const docData = await getDoc(colRef)
-      console.log('docData: ', docData.data());
-      setValue("user", {
-        id: docData.id,
-        ...docData.data()
-      });
+      if (!userInfo.email) return;
+      const q = query(collection(db, "users"), where("email", "==", userInfo.email))
+      const querySnapshot = await getDocs(q)
+      querySnapshot.forEach(doc => {
+        setValue("user", {
+          id: doc.id,
+          ...doc.data()
+        })
+      })
     }
     fetchUserDate();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [userInfo.id])
+  }, [userInfo.email])
 
   const addPostHandler = async (values) => {
     setLoading(true);
@@ -82,21 +82,22 @@ const PostAddNew = () => {
       cloneValue.status = Number(values.status);
       console.log('cloneValue: ', cloneValue);
       const colRef = collection(db, 'posts');
-      // await addDoc(colRef, {
-      //   ...cloneValue,
-      //   image,
-      //   userId: userInfo.uid,
-      //   createAt: serverTimestamp(),
-      // });
-      // toast.success('Create new post successfully');
-      // reset({
-      //   title: '',
-      //   slug: '',
-      //   status: 2,
-      //   hot: false,
-      //   image: '',
-      //   category: {}
-      // });
+      await addDoc(colRef, {
+        ...cloneValue,
+        image,
+        userId: userInfo.uid,
+        createAt: serverTimestamp(),
+      });
+      toast.success('Create new post successfully');
+      reset({
+        title: '',
+        slug: '',
+        status: 2,
+        hot: false,
+        image: '',
+        category: {},
+        user: {}
+      });
       handleResetUpload('');
       setSelectCategory({});
     } catch (error) {

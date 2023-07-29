@@ -1,14 +1,11 @@
-import { useAuth } from "contexts/auth-context";
 import {
     deleteObject,
     getDownloadURL,
     getStorage,
     ref,
     uploadBytesResumable,
-} from "firebase/storage";
-import { useState } from "react";
-import Swal from "sweetalert2";
-import { userRole } from "utils/constants";
+} from 'firebase/storage';
+import { useState } from 'react';
 
 export default function useFirebaseImage(
     setValue,
@@ -16,42 +13,37 @@ export default function useFirebaseImage(
     imageName = null,
     cb = null
 ) {
-    const { userInfo } = useAuth();
     const [progress, setProgress] = useState(0);
-    const [image, setImage] = useState("");
+    const [image, setImage] = useState('');
     if (!setValue || !getValues) return;
+
     const handleUploadImage = (file) => {
-        if (userInfo?.role !== userRole.ADMIN) {
-            Swal.fire("Failed", "You have no right to do this action", "warning");
-            return;
-        }
         const storage = getStorage();
-        const storageRef = ref(storage, "images/" + file.name);
+        const storageRef = ref(storage, 'images/' + file.name);
         const uploadTask = uploadBytesResumable(storageRef, file);
         uploadTask.on(
-            "state_changed",
+            'state_changed',
             (snapshot) => {
                 const progressPercent =
                     (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
                 setProgress(progressPercent);
                 switch (snapshot.state) {
-                    case "paused":
-                        console.log("Upload is paused");
+                    case 'paused':
+                        console.log('Upload is paused');
                         break;
-                    case "running":
-                        console.log("Upload is running");
+                    case 'running':
+                        console.log('Upload is running');
                         break;
                     default:
-                        console.log("Nothing at all");
+                        console.log('Nothing at all');
                 }
             },
             (error) => {
-                console.log("Error");
-                setImage("");
+                console.log('Error');
             },
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((downloadURL) => {
-                    console.log("File available at", downloadURL);
+                    console.log('File available at', downloadURL);
                     setImage(downloadURL);
                 });
             }
@@ -59,36 +51,31 @@ export default function useFirebaseImage(
     };
     const handleSelectImage = (e) => {
         const file = e.target.files[0];
+        console.log('file: ', file);
         if (!file) return;
-        setValue("image_name", file.name);
+        setValue('image_name', file.name);
         handleUploadImage(file);
     };
-
     const handleDeleteImage = () => {
-        if (userInfo?.role !== userRole.ADMIN) {
-            Swal.fire("Failed", "You have no right to do this action", "warning");
-            return;
-        }
         const storage = getStorage();
         const imageRef = ref(
             storage,
-            "images/" + (imageName || getValues("image_name"))
+            'images/' + (imageName || getValues('image_name'))
         );
         deleteObject(imageRef)
             .then(() => {
-                console.log("Remove image successfully");
-                setImage("");
+                console.log('delete image');
+                setImage('');
                 setProgress(0);
                 cb && cb();
             })
             .catch((error) => {
-                console.log("handleDeleteImage ~ error", error);
-                console.log("Can not delete image");
-                setImage("");
+                console.log('error: ', error);
+                console.log('Can not delete image');
             });
     };
     const handleResetUpload = () => {
-        setImage("");
+        setImage('');
         setProgress(0);
     };
     return {
