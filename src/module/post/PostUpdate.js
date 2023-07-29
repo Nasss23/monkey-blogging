@@ -14,8 +14,11 @@ import React from 'react';
 import { useEffect } from 'react';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import { postStatus } from 'utils/constants';
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
+import { toast } from 'react-toastify';
 
 const PostUpdate = () => {
   const [params] = useSearchParams();
@@ -23,6 +26,7 @@ const PostUpdate = () => {
   const [loading, setLoading] = useState(false);
   const [categories, setCatrgories] = useState([]);
   const [selectCategory, setSelectCategory] = useState('');
+  const [content, setContent] = useState("")
   const { control, handleSubmit, setValue, getValues, watch, reset } = useForm({
     mode: "onChange"
   });
@@ -43,10 +47,6 @@ const PostUpdate = () => {
     setImage(imageURL);
   }, [imageURL, setImage]);
 
-  const updatePostHandler = (values) => {
-    console.log('values: ', values);
-
-  }
   useEffect(() => {
     async function getCategoriesData() {
       const colRef = collection(db, 'category');
@@ -86,6 +86,13 @@ const PostUpdate = () => {
     });
     setSelectCategory(item);
   };
+  const updatePostHandler = async (values) => {
+    const docRef = doc(db, "posts", postId);
+    await updateDoc(docRef, {
+      content
+    })
+    toast.success("Update successfully")
+  }
 
   if (!postId) return
   return (
@@ -145,16 +152,18 @@ const PostUpdate = () => {
               </span>
             )}
           </Field>
-          {/* <Field>
-            <Label>Author</Label>
-            <Input control={control} placeholder='Find the author'></Input>
-          </Field> */}
         </div>
-        <div className='m-10'></div>
+        <div className='mb-10'>
+          <Field>
+            <Label>Content</Label>
+            <div className='w-full entry-content'>
+              <ReactQuill theme="snow" value={content} onChange={setContent} />
+            </div>
+          </Field>
+        </div>
         <div className='form-layout'>
           <Field>
             <Label>Feature post</Label>
-
             <Toggle
               on={watchHot === true}
               onClick={() => setValue('hot', !watchHot)}></Toggle>
@@ -195,7 +204,7 @@ const PostUpdate = () => {
           isLoading={loading}
           disabled={loading}
         >
-          Add new post
+          Update post
         </Button>
       </form>
     </div>
