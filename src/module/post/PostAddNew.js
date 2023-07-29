@@ -145,7 +145,7 @@ const PostAddNew = () => {
         title='Add posts'
         desc='Manage all posts'></DashboardHeading>
       <form onSubmit={handleSubmit(addPostHandler)}>
-        <div className='grid grid-cols-2 mb-10 gap-x-10'>
+        <div className='form-layout'>
           <Field>
             <Label>Title</Label>
             <Input
@@ -162,7 +162,7 @@ const PostAddNew = () => {
               name='slug'></Input>
           </Field>
         </div>
-        <div className='grid grid-cols-2 mb-10 gap-x-10'>
+        <div className='form-layout'>
           <Field>
             <Label>Image</Label>
             <ImageUpload
@@ -199,7 +199,7 @@ const PostAddNew = () => {
             <Input control={control} placeholder='Find the author'></Input>
           </Field> */}
         </div>
-        <div className='grid grid-cols-2 mb-10 gap-x-10'>
+        <div className='form-layout'>
           <Field>
             <Label>Feature post</Label>
 
