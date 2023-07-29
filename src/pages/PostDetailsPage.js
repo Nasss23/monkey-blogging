@@ -116,7 +116,7 @@ const PostDetailsPage = () => {
     }
     fetchData()
   }, [slug])
-  if (!slug) return <PageNotFound></PageNotFound>
+  if (!slug || !postInfo.title) return <PageNotFound></PageNotFound>
   if (!postInfo.title) return null;
   const { user } = postInfo;
   return (
