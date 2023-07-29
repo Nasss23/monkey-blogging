@@ -29,39 +29,50 @@ const UserUpdate = () => {
 
     const [params] = useSearchParams();
     const userId = params.get('id');
+    const watchRole = watch('role');
+    const watchStatus = watch('status');
+    const imageURL = getValues('avatar');
+    const imageRegex = /%2F(\S+)\?/gm.exec(imageURL);
+    const imageName = imageRegex?.length > 0 ? imageRegex[1] : '';
+    const { image, setImage, progress, handleSelectImage, handleDeleteImage } =
+        useFirebaseImage(setValue, getValues, imageName, deleteAvatar);
+
     const handleUpdateUser = async (values) => {
         if (!isValid) return;
         try {
-            const colRef = doc(db, "users", userId);
+            const colRef = doc(db, 'users', userId);
             await updateDoc(colRef, {
                 ...values,
-            })
-            toast.success("Update user successfully!!")
+                avatar: image,
+            });
+            toast.success('Update user successfully!!');
         } catch (error) {
             console.log('error: ', error);
-            toast.error("Update user failed")
+            toast.error('Update user failed');
         }
-
     };
-    const watchRole = watch('role');
-    const watchStatus = watch('status');
-    const imageURL = getValues("avatar")
+
+    async function deleteAvatar() {
+        const colRef = doc(db, 'users', userId);
+        await updateDoc(colRef, {
+            avatar: '',
+        });
+    }
+
+    useEffect(() => {
+        setImage(imageURL);
+    }, [imageURL, setImage]);
+
     useEffect(() => {
         async function fetchData() {
             if (!userId) return;
-            const colRef = doc(db, "users", userId);
-            const docData = await getDoc(colRef)
-            reset(docData && docData.data())
+            const colRef = doc(db, 'users', userId);
+            const docData = await getDoc(colRef);
+            reset(docData && docData.data());
         }
-        fetchData()
-    }, [userId, reset])
-    const {
-        image,
-        handleResetUpload,
-        progress,
-        handleSelectImage,
-        handleDeleteImage,
-    } = useFirebaseImage(setValue, getValues);
+        fetchData();
+    }, [userId, reset]);
+
     if (!userId) return null;
 
     return (
@@ -76,8 +87,7 @@ const UserUpdate = () => {
                         onChange={handleSelectImage}
                         handleDeleteImage={handleDeleteImage}
                         progress={progress}
-                        image={imageURL}
-                    ></ImageUpload>
+                        image={image}></ImageUpload>
                 </div>
                 <div className='form-layout'>
                     <Field>
