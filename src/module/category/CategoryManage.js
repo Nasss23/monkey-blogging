@@ -21,7 +21,7 @@ import Swal from 'sweetalert2';
 import { useNavigate } from 'react-router-dom';
 import { debounce } from 'lodash';
 
-const CATEGORY_PER_PAGE = 10;
+const CATEGORY_PER_PAGE = 1;
 
 const CategoryManage = () => {
   const [categoryList, setCategoyList] = useState([]);
@@ -29,6 +29,7 @@ const CategoryManage = () => {
   const [filter, setFilter] = useState('');
   const [lastDoc, setLastDoc] = useState();
   const [total, setTotal] = useState(0)
+
   const handleLoadMoreCategory = async () => {
     const nextRef = query(
       collection(db, 'category'),
@@ -71,7 +72,6 @@ const CategoryManage = () => {
       onSnapshot(colRef, snapshot => {
         setTotal(snapshot.size);
       });
-
       setLastDoc(lastVisible);
       onSnapshot(newRef, (snapshot) => {
         let result = [];
