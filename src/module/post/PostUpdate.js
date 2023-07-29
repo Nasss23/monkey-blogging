@@ -21,6 +21,8 @@ import 'react-quill/dist/quill.snow.css';
 import { toast } from 'react-toastify';
 import ImageUploader from "quill-image-uploader";
 import { useMemo } from 'react';
+import { imgbbAPI } from 'config/apiConfig';
+import axios from 'axios';
 Quill.register('modules/imageUploader', ImageUploader);
 
 const PostUpdate = () => {
@@ -107,10 +109,18 @@ const PostUpdate = () => {
       ['link', 'image']
     ],
     imageUploader: {
-      upload: (file) => {
-        return new Promise((resolve, reject) => {
-          resolve("https://images.unsplash.com/file-1682622471311-bc563ce601cbimage?dpr=2&auto=format&fit=crop&w=416&q=60")
-        });
+      upload: async (file) => {
+        const bodyFormData = new FormData()
+        bodyFormData.append("image", file)
+        const reponse = await axios({
+          method: "post",
+          url: imgbbAPI,
+          data: bodyFormData,
+          header: {
+            "Content-Type": "multipart/form-data"
+          },
+        })
+        return reponse.data.data.url
       },
     }
   }), [])
