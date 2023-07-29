@@ -16,6 +16,8 @@ import Toggle from 'components/toggle/Toggle';
 import {
   addDoc,
   collection,
+  doc,
+  getDoc,
   getDocs,
   query,
   serverTimestamp,
@@ -29,15 +31,16 @@ const PostAddNewStyles = styled.div``;
 
 const PostAddNew = () => {
   const { userInfo } = useAuth();
+  console.log('userInfo: ', userInfo);
   const { control, watch, setValue, handleSubmit, getValues, reset } = useForm({
     mode: 'onChange',
     defaultValues: {
       title: '',
       slug: '',
       status: 2,
-      categoryId: '',
       hot: false,
       image: '',
+      category: {}
     },
   });
   const watchStatus = watch('status');
@@ -51,9 +54,25 @@ const PostAddNew = () => {
     handleSelectImage,
     handleDeleteImage,
   } = useFirebaseImage(setValue, getValues);
-  const [category, setCatrgory] = useState([]);
+  const [categories, setCatrgories] = useState([]);
   const [selectCategory, setSelectCategory] = useState('');
   const [loading, setLoading] = useState(false);
+  const [userDetails, setUserDetails] = useState({})
+  const [categoryDetails, setCatrgoryDetails] = useState({})
+  useEffect(() => {
+    async function fetchUserDate() {
+      if (!userInfo.id) return;
+      const colRef = doc(db, 'users', userInfo.email)
+      const docData = await getDoc(colRef)
+      console.log('docData: ', docData.data());
+      setValue("user", {
+        id: docData.id,
+        ...docData.data()
+      });
+    }
+    fetchUserDate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [userInfo.id])
 
   const addPostHandler = async (values) => {
     setLoading(true);
@@ -61,22 +80,23 @@ const PostAddNew = () => {
       const cloneValue = { ...values };
       cloneValue.slug = slugify(values.slug || values.title, { lower: true });
       cloneValue.status = Number(values.status);
+      console.log('cloneValue: ', cloneValue);
       const colRef = collection(db, 'posts');
-      await addDoc(colRef, {
-        ...cloneValue,
-        image,
-        userId: userInfo.uid,
-        createAt: serverTimestamp(),
-      });
-      toast.success('Create new post successfully');
-      reset({
-        title: '',
-        slug: '',
-        status: 2,
-        categoryId: '',
-        hot: false,
-        image: '',
-      });
+      // await addDoc(colRef, {
+      //   ...cloneValue,
+      //   image,
+      //   userId: userInfo.uid,
+      //   createAt: serverTimestamp(),
+      // });
+      // toast.success('Create new post successfully');
+      // reset({
+      //   title: '',
+      //   slug: '',
+      //   status: 2,
+      //   hot: false,
+      //   image: '',
+      //   category: {}
+      // });
       handleResetUpload('');
       setSelectCategory({});
     } catch (error) {
@@ -98,7 +118,7 @@ const PostAddNew = () => {
           ...doc.data(),
         });
       });
-      setCatrgory(result);
+      setCatrgories(result);
     }
     getData();
   }, []);
@@ -107,8 +127,13 @@ const PostAddNew = () => {
     document.title = 'Monkey Bloggig - Add new post'
   })
 
-  const handleClickOption = (item) => {
-    setValue('categoryId', item.id);
+  const handleClickOption = async (item) => {
+    const colRef = doc(db, 'category', item.id)
+    const docData = await getDoc(colRef)
+    setValue("category", {
+      id: docData.id,
+      ...docData.data()
+    });
     setSelectCategory(item);
   };
 
@@ -149,8 +174,8 @@ const PostAddNew = () => {
               {/* <Dropdown.Select placeholder={`${selectCategory.name || 'Select the category'}`}></Dropdown.Select> */}
               <Dropdown.Select placeholder='Select the category'></Dropdown.Select>
               <Dropdown.List>
-                {category.length > 0 &&
-                  category.map((item) => (
+                {categories.length > 0 &&
+                  categories.map((item) => (
                     <Dropdown.Option
                       key={item.id}
                       onClick={() => handleClickOption(item)}>
