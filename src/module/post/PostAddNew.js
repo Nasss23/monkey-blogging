@@ -9,7 +9,6 @@ import { useForm } from 'react-hook-form';
 import slugify from 'slugify';
 import styled from 'styled-components';
 import { postStatus } from 'utils/constants';
-
 import ImageUpload from 'components/image/ImageUpload';
 import useFirebaseImage from 'hooks/useFirebaseImage';
 import Toggle from 'components/toggle/Toggle';
@@ -86,7 +85,8 @@ const PostAddNew = () => {
       await addDoc(colRef, {
         ...cloneValue,
         image,
-        userId: userInfo.uid,
+        userId: cloneValue.user.id,
+        categoryId: cloneValue.category.id,
         createAt: serverTimestamp(),
       });
       toast.success('Create new post successfully');

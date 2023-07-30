@@ -14,6 +14,7 @@ import { db } from "firebase-app/firebase-config";
 import { useState } from "react";
 import parse from 'html-react-parser';
 import AuthorBox from "components/author/AuthorBox";
+import PostRelated from "module/post/PostRelated";
 
 const PostDetailsPageStyles = styled.div`
   padding-bottom: 100px;
@@ -117,7 +118,7 @@ const PostDetailsPage = () => {
     }
     fetchData()
   }, [slug])
-  if (!slug || !postInfo.title) return <PageNotFound></PageNotFound>
+  if (!slug) return <PageNotFound></PageNotFound>
   if (!postInfo.title) return null;
   const { user } = postInfo;
   return (
@@ -143,15 +144,8 @@ const PostDetailsPage = () => {
             </div>
             <AuthorBox userId={user.id}></AuthorBox>
           </div>
-          <div className="post-related">
-            <Heading>Bài viết liên quan</Heading>
-            <div className="grid-layout grid-layout--primary">
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-              <PostItem></PostItem>
-            </div>
-          </div>
+          <PostRelated categoryId={postInfo?.categoryId}>
+          </PostRelated>
         </div>
       </Layout>
     </PostDetailsPageStyles>
