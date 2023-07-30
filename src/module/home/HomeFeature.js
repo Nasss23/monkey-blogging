@@ -35,7 +35,6 @@ const HomeFeature = () => {
     });
   }, []);
   if (post.length <= 0) return null;
-  console.log('post: ', post);
   return (
     <HomeFeatureStyles className='home-block'>
       <div className='container'>

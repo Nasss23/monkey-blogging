@@ -46,6 +46,7 @@ const PostItem = ({ data }) => {
         url={data.image}
         alt=""
         to={data.slug}
+        className="w-[275px]"
       ></PostImage>
       <PostCategory to={data.category?.slug}>{data.category?.name}</PostCategory>
       <PostTitle to={data?.slug}>

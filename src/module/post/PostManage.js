@@ -123,8 +123,8 @@ const PostManage = () => {
     setLastDoc(lastVisible);
   };
 
-  const { userInfo } = useAuth()
-  if (userInfo.role !== userRole.ADMIN) return null;
+  // const { userInfo } = useAuth()
+  // if (userInfo.role !== userRole.ADMIN) return null;
 
   return (
     <div>
