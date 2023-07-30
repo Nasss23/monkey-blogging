@@ -5,6 +5,7 @@ import ImageUpload from 'components/image/ImageUpload';
 import { Input } from 'components/input';
 import { Label } from 'components/label';
 import TextArea from 'components/textarea/TextArea';
+import { useAuth } from 'contexts/auth-context';
 import DashboardHeading from 'drafts/DashboardHeading';
 import { db } from 'firebase-app/firebase-config';
 import { doc, getDoc, updateDoc } from 'firebase/firestore';
@@ -16,6 +17,7 @@ import { toast } from 'react-toastify';
 import { userRole, userStatus } from 'utils/constants';
 
 const UserUpdate = () => {
+
     const {
         control,
         handleSubmit,

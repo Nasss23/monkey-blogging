@@ -2,6 +2,7 @@ import DashboardHeading from "module/dashboard/DashboardHeading";
 import React from "react";
 
 const UserManage = () => {
+
   return (
     <div>
       <DashboardHeading
