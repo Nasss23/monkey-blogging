@@ -85,8 +85,6 @@ const PostAddNew = () => {
       await addDoc(colRef, {
         ...cloneValue,
         image,
-        userId: cloneValue.user.id,
-        categoryId: cloneValue.category.id,
         createAt: serverTimestamp(),
       });
       toast.success('Create new post successfully');

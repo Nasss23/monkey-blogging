@@ -47,12 +47,12 @@ const PostItem = ({ data }) => {
         alt=""
         to={data.slug}
       ></PostImage>
-      <PostCategory>{data.category?.name}</PostCategory>
-      <PostTitle>
+      <PostCategory to={data.category?.slug}>{data.category?.name}</PostCategory>
+      <PostTitle to={data?.slug}>
         {data.title}
       </PostTitle>
       <PostMeta
-        to={slugify(data.user?.fullname || '', { lower: true })}
+        to={slugify(data.user?.username || '', { lower: true })}
         authorName={data.user?.fullname}
         date={formatDate}></PostMeta>
     </PostItemStyles>
